@@ -8,23 +8,36 @@
 
 import UIKit
 
-class MasterViewController: UITableViewController {
+//import MapKit
+import CoreLocation
+
+class MasterViewController: UITableViewController,CLLocationManagerDelegate {
 
     var detailViewController: DetailViewController? = nil
-    var objects = [Any]()
+    //var objects = [Any]()
+    
+    typealias JSONStandard = Dictionary<String, AnyObject>
+    
+    
+    let locationManager = CLLocationManager()
+    var userLocation:CLLocationCoordinate2D!
+    
+    var cities = Cities()
+    
+    var refresher: UIRefreshControl!
 
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        navigationItem.leftBarButtonItem = editButtonItem
-
-        let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(insertNewObject(_:)))
-        navigationItem.rightBarButtonItem = addButton
-        if let split = splitViewController {
-            let controllers = split.viewControllers
-            detailViewController = (controllers[controllers.count-1] as! UINavigationController).topViewController as? DetailViewController
-        }
+        
+        refresher = UIRefreshControl()
+        self.tableView.addSubview(refresher)
+        refresher.attributedTitle = NSAttributedString(string: "Pull to refresh")
+        refresher.addTarget(self, action: #selector(getCities), for: .valueChanged)
+        
+        getCities()
+        
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -36,27 +49,77 @@ class MasterViewController: UITableViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
-    @objc
-    func insertNewObject(_ sender: Any) {
-        objects.insert(NSDate(), at: 0)
-        let indexPath = IndexPath(row: 0, section: 0)
-        tableView.insertRows(at: [indexPath], with: .automatic)
+    
+    
+    func updateUI() {
+        
+        print("finished downloading")
+        self.tableView.reloadData()
+        refresher.endRefreshing()
+        //dateLabel.text = weather.date
+        //tempLabel.text = "\(weather.temp)"
+        //weatherImage.image = UIImage(named: weather.weather)
+        
     }
+    
+    @objc func getCities () {
+        //First get current location, then get cities list.
+        
+        // Ask for Authorisation from the User.
+        self.locationManager.requestAlwaysAuthorization()
+        
+        // For use in foreground
+        self.locationManager.requestWhenInUseAuthorization()
+        
+        if CLLocationManager.locationServicesEnabled() {
+            locationManager.delegate = self
+            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+            locationManager.startUpdatingLocation()
+        }
+    }
+    
 
     // MARK: - Segues
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showDetail" {
             if let indexPath = tableView.indexPathForSelectedRow {
-                let object = objects[indexPath.row] as! NSDate
+                
+                let object = cities.cityList[indexPath.row]
+                //let object = objects[indexPath.row] as! NSDate
+                
                 let controller = (segue.destination as! UINavigationController).topViewController as! DetailViewController
-                controller.detailItem = object
+                //controller.detailItem = object
                 controller.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
                 controller.navigationItem.leftItemsSupplementBackButton = true
             }
         }
     }
+    
+    
+    
+    // MARK: - User Location
+    
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        
+        //let locValue:CLLocationCoordinate2D = manager.location!.coordinate
+        userLocation = manager.location!.coordinate
+        
+        print("locations = \(userLocation.latitude) \(userLocation.longitude)")
+        
+        
+        locationManager.stopUpdatingLocation()
+        
+        print("Started downloading")
+        cities.downloadData(latitude: userLocation.latitude,longitude:userLocation.longitude) {
+            self.updateUI()
+        }
+        
+    }
+    
+    
+    
 
     // MARK: - Table View
 
@@ -65,30 +128,29 @@ class MasterViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return objects.count
+        return cities.cityList.count
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
-
-        let object = objects[indexPath.row] as! NSDate
-        cell.textLabel!.text = object.description
+        //let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath as IndexPath) as! listTableViewCell
+        
+        if let dict = cities.cityList[indexPath.row] as? JSONStandard {
+            
+            cell.nameLabel!.text = dict["name"] as? String
+            
+            let main = dict["main"] as? JSONStandard
+            cell.temperatureLabel!.text = main!["temp"]?.stringValue
+            
+            //cell.myImageView!.image = UIImage(named: "afternoon")!
+        }
+            
+        
         return cell
     }
 
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
 
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            objects.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
-        }
-    }
 
 
 }

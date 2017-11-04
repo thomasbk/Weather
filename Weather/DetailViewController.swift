@@ -39,7 +39,49 @@ class DetailViewController: UIViewController {
             configureView()
         }
     }
-
+    
+    
+    /*
+    
+     {
+     clouds =             {
+         all = 75;
+         };
+     coord =             {
+         lat = "55.0944";
+         lon = "37.03";
+         };
+     dt = 1509741000;
+     id = 529315;
+     main =             {
+         humidity = 66;
+         pressure = 1009;
+         temp = "273.15";
+         "temp_max" = "273.15";
+         "temp_min" = "273.15";
+         };
+     name = Marinki;
+     rain = "<null>";
+     snow = "<null>";
+     sys =             {
+         country = "";
+         };
+     weather =         (
+         {
+             description = "light shower snow";
+             icon = 13n;
+             id = 620;
+             main = Snow;
+         }
+     );
+     wind =             {
+         deg = 270;
+         speed = 3;
+     };
+     }
+    
+    
+*/
 
 }
 
