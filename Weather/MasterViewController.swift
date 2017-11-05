@@ -8,13 +8,15 @@
 
 import UIKit
 
-//import MapKit
+import Alamofire
+
 import CoreLocation
 
 class MasterViewController: UITableViewController,CLLocationManagerDelegate {
 
+    @IBOutlet var dateLabel: UILabel!
+    
     var detailViewController: DetailViewController? = nil
-    //var objects = [Any]()
     
     typealias JSONStandard = Dictionary<String, AnyObject>
     
@@ -36,6 +38,8 @@ class MasterViewController: UITableViewController,CLLocationManagerDelegate {
         refresher.attributedTitle = NSAttributedString(string: "Pull to refresh")
         refresher.addTarget(self, action: #selector(getCities), for: .valueChanged)
         
+        self.dateLabel.text = ""
+        
         getCities()
         
     }
@@ -56,25 +60,34 @@ class MasterViewController: UITableViewController,CLLocationManagerDelegate {
         print("finished downloading")
         self.tableView.reloadData()
         refresher.endRefreshing()
-        //dateLabel.text = weather.date
-        //tempLabel.text = "\(weather.temp)"
-        //weatherImage.image = UIImage(named: weather.weather)
         
     }
     
     @objc func getCities () {
         //First get current location, then get cities list.
         
-        // Ask for Authorisation from the User.
-        self.locationManager.requestAlwaysAuthorization()
+        if (NetworkReachabilityManager()!.isReachable) {
         
-        // For use in foreground
-        self.locationManager.requestWhenInUseAuthorization()
+            // Ask for Authorization from the User.
+            self.locationManager.requestAlwaysAuthorization()
         
-        if CLLocationManager.locationServicesEnabled() {
-            locationManager.delegate = self
-            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
-            locationManager.startUpdatingLocation()
+            // For use in foreground
+            self.locationManager.requestWhenInUseAuthorization()
+        
+            if CLLocationManager.locationServicesEnabled() {
+                locationManager.delegate = self
+                locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+                locationManager.startUpdatingLocation()
+            }
+        }
+        else { // Cant connect to internet
+            
+            guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {
+                    return
+            }
+            appDelegate.showNoConnection()
+            
+            refresher.endRefreshing()
         }
     }
     
@@ -85,11 +98,16 @@ class MasterViewController: UITableViewController,CLLocationManagerDelegate {
         if segue.identifier == "showDetail" {
             if let indexPath = tableView.indexPathForSelectedRow {
                 
-                let object = cities.cityList[indexPath.row]
-                //let object = objects[indexPath.row] as! NSDate
+                let dict = cities.cityList[indexPath.row] as? JSONStandard
+                let weather = dict!["weather"] as? [JSONStandard]
+                let firstWeather = weather![0]
+                
+                let mainWeather = firstWeather["main"] as! String
                 
                 let controller = (segue.destination as! UINavigationController).topViewController as! DetailViewController
-                //controller.detailItem = object
+                controller.mainImage = getImage(condition: mainWeather)
+                controller.detailItem = dict
+                
                 controller.navigationItem.leftBarButtonItem = splitViewController?.displayModeButtonItem
                 controller.navigationItem.leftItemsSupplementBackButton = true
             }
@@ -103,7 +121,6 @@ class MasterViewController: UITableViewController,CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         
-        //let locValue:CLLocationCoordinate2D = manager.location!.coordinate
         userLocation = manager.location!.coordinate
         
         print("locations = \(userLocation.latitude) \(userLocation.longitude)")
@@ -114,8 +131,27 @@ class MasterViewController: UITableViewController,CLLocationManagerDelegate {
         print("Started downloading")
         cities.downloadData(latitude: userLocation.latitude,longitude:userLocation.longitude) {
             self.updateUI()
+            
+            let dateFormatter = DateFormatter()
+            dateFormatter.timeStyle = .medium
+            dateFormatter.dateStyle = .medium
+            
+            let timeString = "Last update: \(dateFormatter.string(from: Date() as Date))"
+            
+            self.dateLabel.text = String(timeString)
+            
         }
         
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        
+        let alert = UIAlertController(title: "Alert", message: "Please enable location services for this app to obtain current weather data.", preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "Accept", style: UIAlertActionStyle.default, handler: nil))
+        
+        if presentedViewController == nil {
+            self.present(alert, animated: true, completion: updateUI)
+        }
     }
     
     
@@ -141,13 +177,48 @@ class MasterViewController: UITableViewController,CLLocationManagerDelegate {
             cell.nameLabel!.text = dict["name"] as? String
             
             let main = dict["main"] as? JSONStandard
-            cell.temperatureLabel!.text = main!["temp"]?.stringValue
+            //cell.temperatureLabel!.text = main!["temp"]?.stringValue
+            cell.temperatureLabel!.text = "Temp: \(Int(round(main!["temp"]! as! Double)))º"
             
-            //cell.myImageView!.image = UIImage(named: "afternoon")!
+            let weather = dict["weather"] as? [JSONStandard]
+            let firstWeather = weather![0]
+            
+            let mainWeather = firstWeather["main"] as! String
+            
+            cell.myImageView!.image = UIImage(named: getImage(condition: mainWeather))!
         }
-            
         
         return cell
+    }
+    
+    
+    func getImage(condition: String) -> String {
+        
+        var imageToShow: String
+        switch condition {
+        case "Rain":
+            imageToShow = "rainy"
+        case "Thunderstorm":
+            imageToShow = "rainy"
+        case "Drizzle":
+            imageToShow = "sun-rainy"
+        case "Snow":
+            imageToShow = "rainy"
+        case "Atmosphere":
+            imageToShow = "windy"
+        case "Clear":
+            imageToShow = "sunny"
+        case "Clouds":
+            imageToShow = "sun-cloudy"
+        case "Extreme":
+            imageToShow = "windy-rainy"
+        case "Additional":
+            imageToShow = "windy-rainy"
+        default:
+            imageToShow = "sun-cloudy"
+        }
+        return imageToShow
+        
     }
 
 

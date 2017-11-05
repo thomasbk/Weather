@@ -20,6 +20,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         let navigationController = splitViewController.viewControllers[splitViewController.viewControllers.count-1] as! UINavigationController
         navigationController.topViewController!.navigationItem.leftBarButtonItem = splitViewController.displayModeButtonItem
         splitViewController.delegate = self
+        
+        
         return true
     }
 
@@ -55,6 +57,33 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
             return true
         }
         return false
+    }
+    
+    
+    
+    // MARK: - NO CONNECTION
+    
+    var flashing = false
+    
+    func showNoConnection() {
+        if !flashing{
+            
+            let screenSize: CGRect = UIScreen.main.bounds
+            let noConView = UIView(frame: CGRect(x: 50, y: 50, width: screenSize.width - 100, height: 200))
+            noConView.backgroundColor = UIColor.blue
+            window!.rootViewController?.view.addSubview(noConView)
+            noConView.alpha = 1.0
+            
+            UIView.animate(withDuration: 0.5, delay: 0.0, options: [.curveEaseIn, .curveEaseOut, .repeat, .autoreverse, .allowUserInteraction], animations: {() -> Void in
+                UIView.setAnimationRepeatCount(4)
+                noConView.alpha = 0.2
+            }, completion: {(finished: Bool) -> Void in
+                noConView.removeFromSuperview()
+                self.flashing = false
+            })
+            
+            flashing = true
+        }
     }
 
 }
