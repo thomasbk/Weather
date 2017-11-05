@@ -175,7 +175,7 @@ class MasterViewController: UITableViewController,CLLocationManagerDelegate {
         if let dict = cities.cityList[indexPath.row] as? JSONStandard {
             
             cell.nameLabel!.text = dict["name"] as? String
-            
+             
             let main = dict["main"] as? JSONStandard
             //cell.temperatureLabel!.text = main!["temp"]?.stringValue
             cell.temperatureLabel!.text = "Temp: \(Int(round(main!["temp"]! as! Double)))º"
