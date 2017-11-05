@@ -78,8 +78,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         if !flashing{
             
             let screenSize: CGRect = UIScreen.main.bounds
-            let noConView = UIView(frame: CGRect(x: 50, y: 50, width: screenSize.width - 100, height: 200))
-            noConView.backgroundColor = UIColor.blue
+            
+            let noConView = UIImageView(frame: CGRect(x: 50, y: 100, width: screenSize.width - 100, height: 200))
+            noConView.image = UIImage(named:"check_connection")
+            noConView.contentMode = UIViewContentMode.scaleAspectFit
+            
             window!.rootViewController?.view.addSubview(noConView)
             noConView.alpha = 1.0
             
