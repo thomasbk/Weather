@@ -22,6 +22,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
         splitViewController.delegate = self
         
         
+        UINavigationBar.appearance().barTintColor = UIColor.white
+        //
+        UINavigationBar.appearance().titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor(red: 11/255, green: 121/255, blue: 217/255, alpha: 1),
+                        NSAttributedStringKey.font: UIFont(name: "Arvo", size: 24)!]
+        
+        let BarButtonItemAppearance = UIBarButtonItem.appearance()
+        BarButtonItemAppearance.setTitleTextAttributes([NSAttributedStringKey.foregroundColor: UIColor.clear], for: .normal)
+
+        
         return true
     }
 

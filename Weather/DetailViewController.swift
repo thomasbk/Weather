@@ -54,16 +54,17 @@ class DetailViewController: UIViewController {
             detailDescriptionLabel.text = firstWeather["description"] as? String
             weatherImageView.image = UIImage(named: mainImage)
             
-            //cell.myImageView!.image = UIImage(named: firstWeather["main"] as! String)!
-            
         }
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        
+            
         configureView()
     }
+
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -78,48 +79,6 @@ class DetailViewController: UIViewController {
         }
     }
     
-    
-    /*
-    
-     {
-     clouds =             {
-         all = 75;
-         };
-     coord =             {
-         lat = "55.0944";
-         lon = "37.03";
-         };
-     dt = 1509741000;
-     id = 529315;
-     main =             {
-         humidity = 66;
-         pressure = 1009;
-         temp = "273.15";
-         "temp_max" = "273.15";
-         "temp_min" = "273.15";
-         };
-     name = Marinki;
-     rain = "<null>";
-     snow = "<null>";
-     sys =             {
-         country = "";
-         };
-     weather =         (
-         {
-             description = "light shower snow";
-             icon = 13n;
-             id = 620;
-             main = Snow;
-         }
-     );
-     wind =             {
-         deg = 270;
-         speed = 3;
-     };
-     }
-    
-    
-*/
 
 }
 

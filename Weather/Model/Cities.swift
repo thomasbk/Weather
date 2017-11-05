@@ -26,7 +26,7 @@ class Cities {
     typealias JSONStandard = Dictionary<String, AnyObject>
     
     let appID = "a7bbbd5e82c675f805e7ae084f742024"
-    let contCities = 10
+    let contCities = 20
     
     
     var date: String {

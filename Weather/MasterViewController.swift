@@ -43,9 +43,10 @@ class MasterViewController: UITableViewController,CLLocationManagerDelegate {
         getCities()
         
     }
-
+    
+    
     override func viewWillAppear(_ animated: Bool) {
-        clearsSelectionOnViewWillAppear = splitViewController!.isCollapsed
+    //    clearsSelectionOnViewWillAppear = splitViewController!.isCollapsed
         super.viewWillAppear(animated)
     }
 
@@ -97,6 +98,8 @@ class MasterViewController: UITableViewController,CLLocationManagerDelegate {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showDetail" {
             if let indexPath = tableView.indexPathForSelectedRow {
+                
+                tableView.deselectRow(at: indexPath, animated: true)
                 
                 let dict = cities.cityList[indexPath.row] as? JSONStandard
                 let weather = dict!["weather"] as? [JSONStandard]

@@ -109,7 +109,6 @@
 				F92DD6AD1FABB88600E80E0C /* Main.storyboard */,
 				F92DD6BB1FABCC1600E80E0C /* Views */,
 				F9FF5C801FABF6E900085B85 /* Model */,
-				F92DD6BC1FABCC5900E80E0C /* Images */,
 				F92DD6B01FABB88600E80E0C /* Assets.xcassets */,
 				F91D43B31FAE95DC002CCEEC /* Fonts */,
 				F92DD6B21FABB88600E80E0C /* LaunchScreen.storyboard */,
@@ -124,13 +123,6 @@
 				F96F28C41FAD56D5008AA523 /* listTableViewCell.swift */,
 			);
 			path = Views;
-			sourceTree = "<group>";
-		};
-		F92DD6BC1FABCC5900E80E0C /* Images */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Images;
 			sourceTree = "<group>";
 		};
 		F9FF5C801FABF6E900085B85 /* Model */ = {
@@ -426,7 +418,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.tbkdev.Weather;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -443,7 +435,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.tbkdev.Weather;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
